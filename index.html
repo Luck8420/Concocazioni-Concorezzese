@@ -105,7 +105,7 @@ function all(){$("tB").className=S.cur=="B"?"on":"";$("tR").className=S.cur=="R"
 function setCasa(c){S.casa=c;$("cs").className=c?"on":"";$("tr").className=c?"":"on";
  if(c)$("luogo").value=HOME;else if($("luogo").value==HOME)$("luogo").value="";draw()}
 
-function wrap(x,t,w){const a=(t||"").split(" "),L=[];let c="";a.forEach(p=>{const s=c?c+" "+p:p;if(x.measureText(s).width>w&&c){L.push(c);c=p}else c=s});if(c)L.push(c);return L}
+function wrap(x,t,w){const a=(t||"").split(" "),L=[];let c="";a.forEach(p=>{const s=c?c+" "+p:p;if(x.measureText(s).width>w&&c){L.push(c);c=p}else c=s});if(c||!L.length)L.push(c);return L}
 let PDF=false,LP=null;
 const W=1080,RED="#c8102e",DK="#231a1a";
 function layout(x,dry,H){
@@ -115,7 +115,7 @@ function layout(x,dry,H){
   x.fillStyle=DK;x.font="36px system-ui,sans-serif";x.fillText("Esordienti U12",260,160);
   const isR=S.cur=="R";x.fillStyle=isR?RED:"#fff";x.fillRect(40,245,1000,140);
   if(!isR){x.strokeStyle=RED;x.lineWidth=12;x.strokeRect(46,251,988,128)}
-  x.fillStyle=isR?"#fff":RED;x.font="bold 88px system-ui,sans-serif";x.textAlign="center";x.fillText(isR?"SQUADRA ROSSA":"SQUADRA BIANCA",W/2,345);x.textAlign="left"}
+  x.fillStyle=isR?"#fff":RED;const bt=isR?"SQUADRA ROSSA":"SQUADRA BIANCA";let bf=88;x.font="bold "+bf+"px system-ui,sans-serif";while(bf>40&&x.measureText(bt).width>900){bf-=2;x.font="bold "+bf+"px system-ui,sans-serif"}x.textAlign="center";x.fillText(bt,W/2,345);x.textAlign="left"}
  x.font="bold 46px system-ui,sans-serif";const EL=wrap(x,evt(),960);let y=470;
  if(!dry){x.fillStyle=DK;EL.forEach((l,i)=>x.fillText(l,60,y+i*58))}
  y+=(EL.length-1)*58+30;
@@ -124,11 +124,11 @@ function layout(x,dry,H){
  D.forEach(([a,b])=>{y+=58;const L=a=="Luogo"?wrap(x,b,640):[b];
   if(!dry){x.fillStyle=RED;x.font="bold 36px system-ui,sans-serif";x.fillText(a+":",60,y);x.fillStyle=DK;x.font="36px system-ui,sans-serif";L.forEach((l,i)=>x.fillText(l,330,y+i*46));
    if(a=="Luogo"&&b){let mw=0;L.forEach((l,i)=>{const w=x.measureText(l).width;mw=Math.max(mw,w);if(PDF)x.fillRect(330,y+i*46+7,w,3)});LP={x:330,y:y-36,w:mw,h:(L.length-1)*46+48}}}
-  y+=(L.length-1)*46});
+  y+=(L.length-1)*46+(L.length>1?18:0)});
  y+=50;if(!dry){x.fillStyle=RED;x.fillRect(60,y,960,4)}
  y+=62;if(!dry){x.fillStyle=RED;x.font="bold 38px system-ui,sans-serif";x.fillText("Convocati ("+P.length+")",60,y)}
  y+=24;
- if(!dry){x.fillStyle=DK;x.font="30px system-ui,sans-serif";P.forEach((n,i)=>{const c=i<rows?0:1,r=i<rows?i:i-rows;x.fillText((i+1)+". "+n,60+c*500,y+44+r*56)})}
+ if(!dry){x.fillStyle=DK;let pf=30;x.font=pf+"px system-ui,sans-serif";while(pf>26&&P.some((n,i)=>x.measureText((i+1)+". "+n).width>455)){pf-=1;x.font=pf+"px system-ui,sans-serif"}P.forEach((n,i)=>{const c=i<rows?0:1,r=i<rows?i:i-rows;let t=(i+1)+". "+n;if(x.measureText(t).width>455){while(t.length>4&&x.measureText(t+"…").width>455)t=t.slice(0,-1);t=t.trimEnd()+"…"}x.fillText(t,60+c*500,y+44+r*56)})}
  y+=rows*56+30;
  [["Mister",staff(S.m)],["Dirigenti",staff(S.d)]].forEach(([a,v])=>{if(!v.length)return;y+=26;x.font="32px system-ui,sans-serif";const L=wrap(x,v.join(", "),680);
   if(!dry){x.fillStyle=RED;x.font="bold 32px system-ui,sans-serif";x.fillText(a+":",60,y+30);x.fillStyle=DK;x.font="32px system-ui,sans-serif";L.forEach((l,i)=>x.fillText(l,300,y+30+i*42))}
